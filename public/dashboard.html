@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+            background-color: #d7e8ba;
+        }
+
+        /* HERO */
+        .hero {
+            height: 100vh;
+            width: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.45),
+                    rgba(0, 0, 0, 0.45)),
+                url("dashboardCentre.jpg") center / cover no-repeat;
+            position: relative;
+            color: white;
+        }
+
+        /* HERO CONTENT */
+        .hero-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .hero-overlay h1 {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+
+        .hero-overlay p {
+            font-size: 1.1rem;
+            margin-bottom: 50px;
+            opacity: 0.9;
+        }
+
+        /* SEARCH */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        #searchBox {
+            font-size: 18px;
+            padding: 14px 20px;
+            width: 360px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+        }
+
+        .search-box button {
+            font-size: 16px;
+            padding: 14px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background: #0056b3;
+        }
+
+        /* SECTIONS */
+        .carousel-section {
+            padding: 50px 6%;
+            background: #d9dcd6;
+            color: #111;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.6rem;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+
+        .see-all {
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: none;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* HORIZONTAL SCROLL */
+        .horizontal-scroll {
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        /* SHOP CARD */
+        .shop-card {
+            min-width: 260px;
+            height: 180px;
+            border-radius: 14px;
+            background: #f4f6fa;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .shop-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .shop-card h3 {
+            font-size: 1.1rem;
+        }
+
+        .shop-card p {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        /* ADD SHOP CARD */
+        .add-shop-card {
+            min-width: 260px;
+            height: 180px;
+            border-radius: 14px;
+            border: 2px dashed #4f46e5;
+            color: #4f46e5;
+            background: #f8faff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-shop-card span {
+            font-size: 2.5rem;
+        }
+
+        .add-shop-card:hover {
+            background: #eef2ff;
+            transform: translateY(-4px);
+        }
+
+        .arrows button {
+            border: none;
+            background: #007bff;
+            color: white;
+            font-size: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 6px;
+        }
+
+        .arrows button:hover {
+            background: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .hero-overlay h1 {
+                font-size: 2rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            #searchBox {
+                width: 100%;
+            }
+
+            .search-box button {
+                width: 100%;
+            }
+
+            .shop-card,
+            .add-shop-card {
+                min-width: 220px;
+                height: 160px;
+            }
+
+            .section-header h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-overlay">
+            <h1>Search & Discover Nearby shops</h1>
+            <p>Find exactly what you need, faster.</p>
+
+            <div class="search-box">
+                <input id="searchBox" type="text" placeholder="Search shops or items..." />
+                <button onclick="searchShops()">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- REGISTERED SHOPS -->
+    <section class="carousel-section" id="registeredSection">
+        <div class="section-header">
+            <h2>Your Registered Shops</h2>
+        </div>
+        <div class="horizontal-scroll" id="yourShops"></div>
+    </section>
+
+    <!-- NEARBY SHOPS -->
+    <section class="carousel-section">
+        <div class="section-header">
+            <h2>Nearby Shops</h2>
+            <div class="arrows">
+                <button onclick="scrollLeft('suggestedShops')">‹</button>
+                <button onclick="scrollRight('suggestedShops')">›</button>
+            </div>
+        </div>
+
+        <!-- 🔴 THIS WAS MISSING -->
+        <div class="horizontal-scroll" id="suggestedShops"></div>
+    </section>
+    <button onclick="logout()" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: #ff4d4d;
+  color: white;
+  cursor: pointer;">
+        Logout
+    </button>
+
+
+</body>
+
+<script type="module">
+    console.log("Dashboard script loaded");
+
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+    import { auth, db } from "./backend/firebase.js";
+    import {
+        doc,
+        getDoc,
+        getDocs,
+        collection
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    let currentUserRole = "";
+    let currentUID = "";
+    let allShops = [];
+
+    // 🔐 AUTH CHECK
+    onAuthStateChanged(auth, async user => {
+        if (!user) {
+            window.location.href = "index.html";
+            return;
+        }
+
+        currentUID = user.uid;
+
+        // Get user role
+        const userSnap = await getDoc(doc(db, "users", currentUID));
+        if (!userSnap.exists()) {
+            window.location.href = "register.html";
+            return;
+        }
+        currentUserRole = userSnap.data().role;
+
+        loadShops();
+    });
+
+    // 📥 LOAD SHOPS
+    async function loadShops() {
+        const snap = await getDocs(collection(db, "business_profiles"));
+        allShops = [];
+
+        snap.forEach(docSnap => {
+            allShops.push({
+                uid: docSnap.id,
+                ...docSnap.data()
+            });
+        });
+
+        renderYourShops();
+        renderSuggestedShops();
+    }
+
+    // 🏪 SECTION 1: YOUR SHOPS
+    function renderYourShops() {
+        const container = document.getElementById("yourShops");
+        const section = container.closest(".carousel-section");
+
+        container.innerHTML = "";
+
+        // Customers should not see this section
+        if (!currentUserRole == "owner") {
+            section.style.display = "none";
+            return;
+        }
+
+        section.style.display = "block";
+
+        // ✅ ALWAYS show Add Shop card
+        const addCard = document.createElement("div");
+        addCard.className = "add-shop-card";
+        addCard.innerHTML = `
+        <span>+</span>
+        <p>Add Shop</p>
+        `;
+        addCard.onclick = () => {
+            window.location.href = "createShop.html";
+        };
+        container.appendChild(addCard);
+
+        // ✅ Show only shopkeeper's shops
+        const myShops = allShops.filter(
+            shop => shop.ownerId === currentUID
+        );
+
+        myShops.forEach(shop => {
+            const div = document.createElement("div");
+            div.className = "shop-card";
+            div.innerHTML = `
+      <h3>${shop.businessName}</h3>
+      <p>${shop.address}</p>
+    `;
+            div.onclick = () => {
+                window.location.href = "addData.html?shopId=" + shop.uid;
+            };
+            container.appendChild(div);
+        });
+    }
+
+
+    // 📍 SECTION 2: SUGGESTED SHOPS
+    function renderSuggestedShops() {
+        const container = document.getElementById("suggestedShops");
+        container.innerHTML = "";
+
+        allShops.forEach(shop => {
+            const div = document.createElement("div");
+            div.className = "shop-card";
+            div.innerHTML = `
+      <h3>${shop.businessName}</h3>
+      <p>${shop.address}</p>
+    `;
+            div.onclick = () => {
+                window.location.href = "shop_prices.html?shopId=" + shop.uid;
+            };
+            container.appendChild(div);
+        });
+    }
+
+
+    //Search shops
+    window.searchShops = function () {
+        const query = document.getElementById("searchBox").value.trim().toLowerCase();
+        const container = document.getElementById("suggestedShops");
+        container.innerHTML = "";
+
+        const filtered = allShops.filter(shop =>
+            shop.businessName?.toLowerCase().includes(query) ||
+            shop.address?.toLowerCase().includes(query) ||
+            shop.category?.toLowerCase().includes(query)
+        );
+
+        if (filtered.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "shop-card";
+            empty.innerHTML = `
+      <h3>No results</h3>
+      <p>Try another keyword</p>
+    `;
+            container.appendChild(empty);
+            return;
+        }
+
+        filtered.forEach(shop => {
+            const div = document.createElement("div");
+            div.className = "shop-card";
+            div.innerHTML = `
+      <h3>${shop.businessName}</h3>
+      <p>${shop.address}</p>
+    `;
+            div.onclick = () => {
+                window.location.href = "shop_prices.html?shopId=" + shop.uid;
+            };
+            container.appendChild(div);
+        });
+    };
+
+    function scrollLeft(id) {
+        document.getElementById(id).scrollBy({
+            left: -300,
+            behavior: "smooth"
+        });
+    }
+
+    function scrollRight(id) {
+        document.getElementById(id).scrollBy({
+            left: 300,
+            behavior: "smooth"
+        });
+    }
+
+    window.logout = async function () {
+        await signOut(auth);
+        window.location.href = "index.html";
+    };
+
+</script>
+
+</html>

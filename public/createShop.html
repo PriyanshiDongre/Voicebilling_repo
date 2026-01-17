@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Register Shop</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+                url("addShop.jpg") no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        /* MAIN CARD */
+        .card {
+            background: rgba(15, 25, 40, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 40px 34px;
+            width: 380px;
+            border-radius: 22px;
+            box-shadow:
+                0 30px 70px rgba(0, 0, 0, 0.85),
+                0 0 40px rgba(0, 180, 216, 0.35);
+            text-align: center;
+            color: #ffffff;
+            animation: popIn 0.5s ease forwards;
+        }
+
+        /* TITLE */
+        .card h2 {
+            margin-bottom: 28px;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+        }
+
+        /* INPUTS */
+        .card input,
+        .card textarea {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.25s ease;
+        }
+
+        /* PLACEHOLDER */
+        .card input::placeholder,
+        .card textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* FOCUS EFFECT */
+        .card input:focus,
+        .card textarea:focus {
+            outline: none;
+            border-color: #00b4d8;
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.25);
+        }
+
+        /* TEXTAREA */
+        .card textarea {
+            resize: none;
+            min-height: 90px;
+        }
+
+        /* BUTTON */
+        .card button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        /* BUTTON HOVER */
+        .card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 180, 216, 0.6);
+        }
+
+        /* BUTTON ACTIVE */
+        .card button:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 15px rgba(0, 180, 216, 0.4);
+        }
+
+        /* STATUS TEXT */
+        #status {
+            margin-top: 14px;
+            font-size: 13px;
+            color: #ffd166;
+        }
+
+        /* ANIMATION */
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* MOBILE */
+        @media (max-width: 480px) {
+            .card {
+                width: 90%;
+                padding: 28px 22px;
+            }
+
+            .card h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>Register Your Shop</h2>
+
+        <input id="businessName" placeholder="Business Name">
+        <input id="category" placeholder="Category (Retail, Grocery, etc)">
+        <input id="phone" placeholder="Phone Number">
+        <textarea id="address" placeholder="Shop Address"></textarea>
+
+        <button onclick="saveShop()">Save & Continue</button>
+
+        <div id="status"></div>
+    </div>
+
+    <script type="module">
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+        import { auth, db } from "backend/firebase.js";
+        import {
+            doc,
+            getDoc,
+            addDoc,
+            getDocs,
+            collection,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+        const statusEl = document.getElementById("status");
+        const nameInput = document.getElementById("businessName");
+        const categoryInput = document.getElementById("category");
+        const phoneInput = document.getElementById("phone");
+        const addressInput = document.getElementById("address");
+
+        /* =========================
+           AUTH CHECK
+        ========================= */
+        let currentUser = null;
+
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                statusEl.innerText = "You must be logged in to register a shop.";
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1500);
+            } else {
+                currentUser = user;
+            }
+        });
+
+        /* =========================
+           VALIDATION
+        ========================= */
+        function validateForm() {
+            if (
+                !nameInput.value.trim() ||
+                !categoryInput.value.trim() ||
+                !phoneInput.value.trim() ||
+                !addressInput.value.trim()
+            ) {
+                statusEl.innerText = "All fields are mandatory.";
+                return false;
+            }
+
+            // Phone validation (India - 10 digits)
+            if (!/^[6-9]\d{9}$/.test(phoneInput.value.trim())) {
+                statusEl.innerText = "Enter a valid 10-digit phone number.";
+                return false;
+            }
+
+            return true;
+        }
+
+        /* =========================
+           SAVE SHOP
+        ========================= */
+        async function saveShop() {
+            if (!currentUser) {
+                statusEl.innerText = "Authentication error. Please login again.";
+                return;
+            }
+
+            if (!validateForm()) return;
+
+            statusEl.innerText = "Saving shop details...";
+
+            try {
+                const docRef = await addDoc(
+                    collection(db, "business_profiles"),
+                    {
+                        ownerId: currentUser.uid,
+                        businessName: nameInput.value.trim(),
+                        category: categoryInput.value.trim(),
+                        phone: phoneInput.value.trim(),
+                        address: addressInput.value.trim(),
+                        createdAt: serverTimestamp()
+                    }
+                );
+
+                statusEl.innerText = "Shop registered successfully! Redirecting...";
+
+                setTimeout(() => {
+                    window.location.href =
+                        `addData.html?shopId=${docRef.id}`;
+                }, 800);
+
+            } catch (err) {
+                console.error("Firestore error:", err);
+                statusEl.innerText = "Failed to save shop. Try again.";
+            }
+        }
+
+        /* =========================
+           EXPOSE TO HTML
+        ========================= */
+        window.saveShop = saveShop;
+    </script>
+</body>
+
+</html>

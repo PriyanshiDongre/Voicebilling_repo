@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Complete Registration</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <div class="hero">
+        <div class="hero-card">
+
+            <h2>Complete Your Profile</h2>
+            <p>All fields are mandatory</p>
+
+            <input id="name" placeholder="Full Name">
+            <input id="address" placeholder="Address">
+            <input id="email" placeholder="Email">
+            <input id="phone" placeholder="Phone Number">
+            <input id="password" type="password" placeholder="Password">
+
+            <select id="role" class="role-select">
+                <option value="" disabled selected>Select Role</option>
+                <option value="owner">shopkeeper</option>
+                <option value="customer">customer</option>
+            </select>
+
+
+            <button class="primary-btn" onclick="registerUser()">Register</button>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./backend/firebase.js";
+        import { createUserWithEmailAndPassword }
+            from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { doc, setDoc, serverTimestamp, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+        const roleSelect = document.getElementById("role");
+
+        roleSelect.addEventListener("change", () => {
+            roleSelect.style.color = "#111";
+        });
+
+        // 🔹 Validation helpers
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function isValidPhone(phone) {
+            return /^[6-9]\d{9}$/.test(phone);
+        }
+
+        // 🔹 Register logic
+        window.registerUser = async function () {
+            const name = document.getElementById("name").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const role = document.getElementById("role").value;
+            const password = document.getElementById("password").value.trim();
+
+
+            // 🔴 Mandatory check
+            if (!name || !address || !email || !phone || !role) {
+                alert("All fields are mandatory");
+                return;
+            }
+
+            // 🔴 Email format check
+            if (!isValidEmail(email)) {
+                alert("Enter a valid email address");
+                return;
+            }
+
+            // 🔴 Phone format check (India)
+            if (!isValidPhone(phone)) {
+                alert("Enter a valid 10-digit phone number");
+                return;
+            }
+
+
+            try {
+                // 🔐 CREATE AUTH USER FIRST
+                const userCred = await createUserWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+                const uid = userCred.user.uid;
+
+                // 💾 SAVE PROFILE DATA
+                await setDoc(doc(db, "users", uid), {
+                    name,
+                    address,
+                    email,
+                    phone,
+                    role,
+                    profileCompleted: true,
+                    createdAt: serverTimestamp()
+                });
+
+                // 🚀 GO TO DASHBOARD
+                window.location.href = "dashboard.html";
+
+            } catch (error) {
+                alert(error.message);
+            }
+        };
+    </script>
+
+</body>
+
+</html>

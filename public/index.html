@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Voice Shop Assistant</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="logo">🎤 VoiceBill</div>
+        <nav>
+            <a href="#" class="nav-link">Docs</a>
+            <a href="#" class="nav-link">About</a>
+            <a href="#login" class="login-btn">Login</a>
+        </nav>
+    </header>
+
+    <!-- HERO SECTION -->
+    <main class="hero">
+        <div class="hero-card" id="login">
+
+            <span class="badge">AI-powered billing</span>
+
+            <h1>
+                Workflow Automation.<br>
+                <span>Built for Small Shops.</span>
+            </h1>
+
+            <p>
+                Convert local-language voice input into instant digital bills,
+                real-time sales tracking, and business insights —
+                all without typing.
+            </p>
+            <input id="email" type="email" placeholder="Email" style="margin-bottom:10px;">
+            <input id="password" type="password" placeholder="Password" style="margin-bottom:20px;">
+
+            <div class="actions">
+                <button class="primary-btn" onclick="login()">Login</button>
+                <button class="primary-btn" onclick="goToRegister()">Sign-Up</button>
+            </div>
+
+</body>
+
+<script type="module">
+    import { auth } from "./backend/firebase.js";
+    import {
+        signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+    // 🔹 Login function
+    window.login = async function () {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email || !password) {
+            alert("Please enter email and password");
+            return;
+        }
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            window.location.href = "dashboard.html";
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    // 🔹 Register redirect
+    window.goToRegister = function () {
+        window.location.href = "register.html";
+    };
+</script>
+
+</html>
