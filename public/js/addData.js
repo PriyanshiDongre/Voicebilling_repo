@@ -8,7 +8,6 @@ import {
     where
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-// ================= CONFIG =================
 const GEMINI_API_KEY = "AIzaSyAFUKQ1XRB7lcK3gkIpWMRwbXfcchdggzY";
 
 // ================= UI ELEMENTS =================
