@@ -67,6 +67,16 @@
             alert(error.message);
         }
     };
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("User already logged in, redirecting...");
+            window.location.href = "dashboard.html";
+        } else {
+            console.log("No user, stay on login page");
+        }
+    });
 
     // 🔹 Register redirect
     window.goToRegister = function () {

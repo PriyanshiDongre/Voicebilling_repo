@@ -7,9 +7,30 @@ import {
     query,
     where
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+/* ==============================
+   PRODUCT CATALOG (FOR VOICE BILLING)
+   Used to show variants after voice input
+================================ */
 
-const GEMINI_API_KEY = "--";
+const productCatalog = {
+    biscuit: [
+        { name: "Parle-G", price: 10 },
+        { name: "Good Day", price: 20 },
+        { name: "Marie Gold", price: 25 },
+        { name: "Oreo", price: 30 }
+    ],
+    soap: [
+        { name: "Lux", price: 30 },
+        { name: "Dove", price: 50 },
+        { name: "Lifebuoy", price: 25 }
+    ]
+};
 
+
+// ================= CONFIG =================
+const GEMINI_API_KEY = "AIzaSyAFUKQ1XRB7lcK3gkIpWMRwbXfcchdggzY";
+
+// ================= UI ELEMENTS =================
 const startBtn = document.getElementById("startBtn");
 const stopBtn = document.getElementById("stopBtn");
 const output = document.getElementById("output");
